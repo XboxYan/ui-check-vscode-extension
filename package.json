@@ -1,0 +1,43 @@
+{
+	"name": "ui-check",
+	"displayName": "ui-check",
+	"description": "UI边界检测",
+	"version": "1.0.0",
+	"engines": {
+		"vscode": "^1.46.0"
+	},
+	"publisher": "xboxyan",
+	"icon": "icon.jpg",
+	"keywords": ["ui检测", "ui", "ui-check"],
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"commands": [
+		{
+			"command": "ui-check.build",
+			"title": "ui检测"
+		}
+	],
+	"main": "./extension.js",
+	"contributes": {
+		
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.46.0",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^7.0.2",
+		"@types/node": "^13.11.0",
+		"eslint": "^6.8.0",
+		"glob": "^7.1.6",
+		"mocha": "^7.1.2",
+		"typescript": "^3.8.3",
+		"vscode-test": "^1.3.0"
+	}
+}
