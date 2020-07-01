@@ -24,6 +24,8 @@
 
 点击该按钮，编辑器顶部会出现输入框，输入所需要检测目录，默认为`./dist/`
 
+> 不能选择项目文件夹及以外
+
 ![ui-input](https://imgservices-1252317822.image.myqcloud.com/image/20200701/pl1875wydr.jpg)
 
 回车`Enter`，会自动生成`/test`目录(暂不能修改)，同时提示“目录test生成完成”

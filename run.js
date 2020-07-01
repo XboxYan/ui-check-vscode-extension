@@ -152,13 +152,22 @@ const randomImg = function(){
     return imglist[Math.floor(Math.random()*len)];
 }
 
-const pathDist = vscode.workspace.rootPath+'/test/';
+const workspace = path.join(vscode.workspace.rootPath,'/');
+
+const pathDist = path.join(workspace,'/test/');
 
 const bulid = function(src,building){
-	const pathSrc = vscode.workspace.rootPath+src;
+	const pathSrc = path.join(workspace,src);
+	console.log(pathSrc)
+	console.log(workspace)
+	if(workspace.includes(pathSrc)){
+		vscode.window.showErrorMessage(`不能选择项目文件夹及以外！`)
+		return false;
+	}
+	return false;
 	clean(pathDist);
 	tasks.forEach(function(task){
-		const dist = pathDist+task.dir;
+		const dist = path.join(pathDist,task.dir);
 		createPath(dist);
 		copy(pathSrc,dist,function(file){
 			const reg_txt = /(?<=>)[^<>]+(?=<(?!\/title|\/style|\/script))/g;
