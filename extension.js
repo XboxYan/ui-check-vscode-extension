@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const path = require('path');
 const build = require('./run');
 
 let statusBar = null;
@@ -26,11 +27,16 @@ function activate(context) {
 			if(value){
 				dist = value;
 				build(value, (filename) => {
+					const pathDist = path.join(vscode.workspace.rootPath,value,'.') + '-test';
 					statusBar.text = `$(loading) 正在生成${filename}...`;
 					this.timer && clearTimeout(this.timer);
 					this.timer = setTimeout(() => {
 						statusBar.text = '$(symbol-keyword) ui-check';
-						vscode.window.showInformationMessage('目录test生成完成！')
+						vscode.window.showInformationMessage('目录生成完成！是否立即打开？','打开', '关闭').then(result => {
+							if(result === '打开'){
+								vscode.env.openExternal(vscode.Uri.parse(pathDist));
+							}
+						});
 					},300)
 				})
 			}

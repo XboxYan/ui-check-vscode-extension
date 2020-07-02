@@ -3,6 +3,7 @@ const vscode = require('vscode');
 const fs = require('fs');
 
 const path = require('path');
+const { TextDecoder } = require('util');
 
 
 /*
@@ -152,28 +153,23 @@ const randomImg = function(){
     return imglist[Math.floor(Math.random()*len)];
 }
 
-const workspace = path.join(vscode.workspace.rootPath,'/');
-
-const pathDist = path.join(workspace,'/test/');
+const workspace = vscode.workspace.rootPath;
 
 const bulid = function(src,building){
 	const pathSrc = path.join(workspace,src);
-	console.log(pathSrc)
-	console.log(workspace)
-	if(workspace.includes(pathSrc)){
-		vscode.window.showErrorMessage(`不能选择项目文件夹及以外！`)
-		return false;
-	}
-	return false;
-	clean(pathDist);
+	const pathDist = path.join(pathSrc,'.') + '-test';
 	tasks.forEach(function(task){
 		const dist = path.join(pathDist,task.dir);
 		createPath(dist);
 		copy(pathSrc,dist,function(file){
-			const reg_txt = /(?<=>)[^<>]+(?=<(?!\/title|\/style|\/script))/g;
+			const reg_txt = /(?<=(?<!script[^>]*)>)[^<>]+(?=<(?!\/title|\/style|\/script))/g;
 			const reg_img = /<img [^>]*src=['"]([^'"]+)[^>]*>/gi;
 			return file.replace(reg_txt,function(txt){
-				return txt.repeat(task.times);
+				if(txt.trim()){
+					return txt.repeat(task.times);
+				}else{
+					return txt;
+				}
 			}).replace(reg_img, function (match, capture) {
 				return match.replace(capture,task.img?randomImg():null);
 			});
