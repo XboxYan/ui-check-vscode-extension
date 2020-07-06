@@ -98,10 +98,10 @@ const copy = function (src, dst, callback, building) {
 
 		// 判断是否为文件
 		if (st.isFile()) {
-            if(path.extname(_src) === '.html'){
+            if( ['.html','.vue','.wxml'].includes(path.extname(_src))){
                 fs.readFile(_src,'utf8',function(err,file){
                     const filename = path.join(dst, path.basename(_src));
-                    file = callback(file,dst);
+                    file = callback(file,dst,['.vue','.wxml'].includes(path.extname(_src)));
                     fs.writeFile(filename,file,function(){
 						building && building(filename);
                     })
@@ -158,6 +158,24 @@ const randomImg = function(){
     return imglist[Math.floor(Math.random()*len)];
 }
 
+const renderTxt = function(str,t){
+	if(str.trim()){
+		if(t.random){
+			return str.repeat(Math.floor(Math.random()*4))
+		}
+		return str.repeat(t.times);
+	}else{
+		return str;
+	}
+}
+
+const renderImg = function(match,source,t){
+	if(t.random){
+		return match.replace(source,Math.random()>.5?randomImg():null)
+	}
+	return match.replace(source,t.img?randomImg():null);
+}
+
 const workspace = vscode.workspace.rootPath;
 
 const bulid = function(src,building){
@@ -166,23 +184,28 @@ const bulid = function(src,building){
 	tasks.forEach(function(task){
 		const dist = path.join(pathDist,task.dir);
 		createPath(dist);
-		copy(pathSrc,dist,function(file){
+		copy(pathSrc,dist,function(file,dist,isTemp){
 			const reg_txt = /(?<=(?<!script[^>]*)>)[^<>]+(?=<(?!\/title|\/style|\/script))/g;
-			const reg_img = /<img [^>]*src=['"]([^'"]+)[^>]*>/gi;
-			return file.replace(reg_txt,function(txt){
-				if(txt.trim()){
-					if(task.random){
-						return txt.repeat(Math.floor(Math.random()*4))
-					}
-					return txt.repeat(task.times);
+			const reg_img = /<(img|image) [^>]*src=['"]([^'"]+)[^>]*>/gi;
+			const reg_dy = /{{[^}]+}}/g;
+			return file.replace(reg_txt,function(str){
+				if( isTemp ){
+					return str.replace(reg_dy,function(txt){
+						return renderTxt(txt,task);
+					});
 				}else{
-					return txt;
+					return renderTxt(str,task);
 				}
-			}).replace(reg_img, function (match, capture) {
-				if(task.random){
-					return match.replace(capture,Math.random()>.5?randomImg():null)
+			}).replace(reg_img, function (match, capture, source) {
+				if( isTemp ){
+					if(reg_dy.test(source)){
+						return renderImg(match,source,task);
+					}else{
+						return match;
+					}
+				}else{
+					return renderImg(match,source,task);
 				}
-				return match.replace(capture,task.img?randomImg():null);
 			});
 		},building);
 	})
