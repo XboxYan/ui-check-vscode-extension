@@ -145,7 +145,12 @@ const tasks = [
         dir: 'empty/',
         times: 0,
         img: false
-    }
+    },
+    {
+        desc: '内容随机的情况',
+        dir: 'random/',
+        random: true,
+    },
 ]
 
 const randomImg = function(){
@@ -166,11 +171,17 @@ const bulid = function(src,building){
 			const reg_img = /<img [^>]*src=['"]([^'"]+)[^>]*>/gi;
 			return file.replace(reg_txt,function(txt){
 				if(txt.trim()){
+					if(task.random){
+						return txt.repeat(Math.floor(Math.random()*4))
+					}
 					return txt.repeat(task.times);
 				}else{
 					return txt;
 				}
 			}).replace(reg_img, function (match, capture) {
+				if(task.random){
+					return match.replace(capture,Math.random()>.5?randomImg():null)
+				}
 				return match.replace(capture,task.img?randomImg():null);
 			});
 		},building);
