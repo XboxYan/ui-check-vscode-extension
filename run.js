@@ -101,7 +101,7 @@ const copy = function (src, dst, callback, building) {
             if( ['.html','.vue','.wxml'].includes(path.extname(_src))){
                 fs.readFile(_src,'utf8',function(err,file){
                     const filename = path.join(dst, path.basename(_src));
-                    file = callback(file,dst,['.vue','.wxml'].includes(path.extname(_src)));
+                    file = callback(file,dst);
                     fs.writeFile(filename,file,function(){
 						building && building(filename);
                     })
@@ -181,31 +181,17 @@ const workspace = vscode.workspace.rootPath;
 const bulid = function(src,building){
 	const pathSrc = path.join(workspace,src);
 	const pathDist = path.join(pathSrc,'.') + '-test';
+	clean(pathDist);
 	tasks.forEach(function(task){
 		const dist = path.join(pathDist,task.dir);
 		createPath(dist);
-		copy(pathSrc,dist,function(file,dist,isTemp){
+		copy(pathSrc,dist,function(file){
 			const reg_txt = /(?<=(?<!script[^>]*)>)[^<>]+(?=<(?!\/title|\/style|\/script))/g;
 			const reg_img = /<(img|image) [^>]*src=['"]([^'"]+)[^>]*>/gi;
-			const reg_dy = /{{[^}]+}}/g;
 			return file.replace(reg_txt,function(str){
-				if( isTemp ){
-					return str.replace(reg_dy,function(txt){
-						return renderTxt(txt,task);
-					});
-				}else{
-					return renderTxt(str,task);
-				}
+				return renderTxt(str,task);
 			}).replace(reg_img, function (match, capture, source) {
-				if( isTemp ){
-					if(reg_dy.test(source)){
-						return renderImg(match,source,task);
-					}else{
-						return match;
-					}
-				}else{
-					return renderImg(match,source,task);
-				}
+				return renderImg(match,source,task);
 			});
 		},building);
 	})
