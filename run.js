@@ -98,7 +98,7 @@ const copy = function (src, dst, callback, building) {
 
 		// 判断是否为文件
 		if (st.isFile()) {
-            if( ['.html','.vue','.wxml'].includes(path.extname(_src))){
+            if( ['.html','.vue','.wxml','.qml'].includes(path.extname(_src))){
                 fs.readFile(_src,'utf8',function(err,file){
                     const filename = path.join(dst, path.basename(_src));
                     file = callback(file,dst);

@@ -15,7 +15,7 @@
   |--random            -> 文本图片资源随机的情况
 ```
 
-> 提示：目前支持HTML原型(.html)、小程序(.wxml)、vue项目(.vue)
+> 提示：目前支持HTML原型(.html)、小程序(.wxml/.qml)、vue项目(.vue)
 
 ## Usage
 
